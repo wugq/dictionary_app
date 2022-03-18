@@ -25,7 +25,7 @@ void main() {
     pronunciationList: [],
   );
 
-  test("should get work from repository", () async {
+  test("should get word from repository", () async {
     when(mockRepository.search(any))
         .thenAnswer((_) async => const Right(tWord));
 
