@@ -18,7 +18,18 @@ class SearchWordBloc extends Bloc<SearchWordEvent, SearchWordState> {
     required this.searchWord,
   }) : super(SearchWordInitial()) {
     on<SearchWordEvent>((event, emit) {
-      // TODO: implement event handler
+      if (event is SearchWordEventGetWord) {
+        _search(event.text, emit);
+      }
     });
+  }
+
+  void _search(String text, Emitter<SearchWordState> emit) async {
+    emit(SearchWordStateLoading());
+    final failedOrWord = await searchWord(SearchWordParam(word: text));
+    failedOrWord.fold(
+      (l) => emit(const SearchWordStateFailed(serverFailureMessage)),
+      (r) => emit(SearchWordStateLoaded(r)),
+    );
   }
 }

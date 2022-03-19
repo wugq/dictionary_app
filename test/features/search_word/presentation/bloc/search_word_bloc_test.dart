@@ -53,7 +53,7 @@ void main() {
     },
     expect: () => [
       SearchWordStateLoading(),
-      const SearchWordStateFailed("message"),
+      const SearchWordStateFailed(serverFailureMessage),
     ],
   );
 }
