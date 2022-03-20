@@ -25,6 +25,7 @@ dependencies:
   get_it: ^7.2.0
   google_fonts: ^2.3.1
   http: ^0.13.4
+  just_audio: ^0.9.20
   mockito: ^5.1.0
   shared_preferences: ^2.0.13
 

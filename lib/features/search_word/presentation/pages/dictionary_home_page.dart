@@ -2,6 +2,7 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../../../../injection_container.dart';
 import '../../domain/entities/word.dart';
@@ -21,6 +22,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late Word theWord;
   late SearchWordBloc theBloc;
+  final audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -156,7 +158,9 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () {
+          playAudio(pronunciation.audio);
+        },
         style: ButtonStyle(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
@@ -263,5 +267,14 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
       return;
     }
     theBloc.add(SearchWordEventGetWord(word));
+  }
+
+  void playAudio(String url) async {
+    String audioUrl = url.trim();
+    if (audioUrl.isEmpty) {
+      return;
+    }
+    await audioPlayer.setUrl(audioUrl);
+    audioPlayer.play();
   }
 }
