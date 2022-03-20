@@ -116,12 +116,15 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text(
-              definition.definition,
-              style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  color: Color(0xFF270303),
-                  fontWeight: FontWeight.normal),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                definition.definition,
+                style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF270303),
+                    fontWeight: FontWeight.normal),
+              ),
             ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
