@@ -1,4 +1,4 @@
-import 'dart:async';
+// import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:dictionary/features/search_word/domain/entities/word.dart';
@@ -17,14 +17,14 @@ class SearchWordBloc extends Bloc<SearchWordEvent, SearchWordState> {
   SearchWordBloc({
     required this.searchWord,
   }) : super(SearchWordInitial()) {
-    on<SearchWordEvent>((event, emit) {
+    on<SearchWordEvent>((event, emit) async {
       if (event is SearchWordEventGetWord) {
-        _search(event.text, emit);
+        await _search(event.text, emit);
       }
     });
   }
 
-  void _search(String text, Emitter<SearchWordState> emit) async {
+  Future<void> _search(String text, Emitter<SearchWordState> emit) async {
     emit(SearchWordStateLoading());
     final failedOrWord = await searchWord(SearchWordParam(word: text));
     failedOrWord.fold(

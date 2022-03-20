@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:dictionary/core/core.dart';
-import 'package:dictionary/core/error/failure.dart';
 import 'package:dictionary/features/search_word/data/datasources/search_word_remote_data_source.dart';
 import 'package:dictionary/features/search_word/domain/entities/word.dart';
 import 'package:dictionary/features/search_word/domain/repositories/search_word_repository.dart';

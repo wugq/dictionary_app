@@ -1,7 +1,11 @@
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../injection_container.dart';
+import '../../domain/entities/word.dart';
+import '../bloc/search_word_bloc.dart';
 
 class DictionaryHomePageWidget extends StatefulWidget {
   const DictionaryHomePageWidget({required Key key}) : super(key: key);
@@ -15,11 +19,15 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   late TextEditingController textController;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  late Word theWord;
+  late SearchWordBloc theBloc;
 
   @override
   void initState() {
     super.initState();
+    theWord = const Word(text: "", pronunciationList: [], meaningList: []);
     textController = TextEditingController();
+    theBloc = sl<SearchWordBloc>();
   }
 
   @override
@@ -33,41 +41,68 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
           'Dictionary',
           style: TextStyle(color: Colors.black),
         ),
-        actions: [],
         centerTitle: true,
         elevation: 0,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            scrollDirection: Axis.vertical,
-            children: [
-              searchWidget(),
-              thisWordWidget("hi"),
-              SizedBox(
-                height: 30,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    pronunciationBtn("hi"),
-                  ],
-                ),
-              ),
-              Column(
+      body: BlocProvider(
+        create: (_) => theBloc,
+        child: BlocListener<SearchWordBloc, SearchWordState>(
+          listener: (context, state) {
+            if (state is SearchWordStateLoaded) {
+              setState(() {
+                theWord = state.word;
+              });
+            }
+          },
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+              child: ListView(
+                padding: EdgeInsets.zero,
+                scrollDirection: Axis.vertical,
                 children: [
-                  meaningWidget(),
+                  searchWidget(),
+                  thisWordWidget(theWord.text),
+                  showPronunciationList(theWord.pronunciationList),
+                  showMeaningList(theWord.meaningList),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget meaningWidget() {
+  Widget showPronunciationList(List<Pronunciation> list) {
+    if (list.isEmpty) {
+      return Container();
+    }
+    return SizedBox(
+      height: 30,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          for (var pronunciation in list) pronunciationBtn(pronunciation),
+        ],
+      ),
+    );
+  }
+
+  Widget showMeaningList(List<Meaning> list) {
+    if (list.isEmpty) {
+      return Container();
+    }
+    return Column(
+      children: [
+        for (var meaning in list)
+          for (var definition in meaning.definitionList)
+            definitionWidget(definition)
+      ],
+    );
+  }
+
+  Widget definitionWidget(Definition definition) {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       color: const Color(0xFFF5F5F5),
@@ -80,7 +115,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Text(
-              'Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World',
+              definition.definition,
               style: const TextStyle(
                   fontFamily: 'Poppins',
                   color: Color(0xFF270303),
@@ -92,21 +127,22 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '* Hello WorldHello ',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
+                children: [
+                  for (var item in definition.exampleList)
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "* $item",
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w300,
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -116,7 +152,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     );
   }
 
-  Widget pronunciationBtn(String text) {
+  Widget pronunciationBtn(Pronunciation pronunciation) {
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
       child: ElevatedButton.icon(
@@ -128,7 +164,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
             ),
           ),
         ),
-        label: Text(text),
+        label: Text(pronunciation.text),
         icon: const FaIcon(
           FontAwesomeIcons.volumeHigh,
           size: 12,
@@ -138,6 +174,9 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   }
 
   Widget thisWordWidget(String title) {
+    if (title == "") {
+      return Container();
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
       child: Align(
@@ -170,6 +209,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                   const Duration(milliseconds: 2000),
                   () => setState(() {}),
                 ),
+                textInputAction: TextInputAction.search,
                 controller: textController,
                 obscureText: false,
                 decoration: InputDecoration(
@@ -205,17 +245,23 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                         )
                       : null,
                 ),
-                // style:
-                //     FlutterFlowTheme.of(context).bodyText1.override(
-                //           fontFamily: 'Poppins',
-                //           color: Color(0xFF091249),
-                //         ),
                 textAlign: TextAlign.start,
+                onFieldSubmitted: (_) {
+                  _callSearchWord();
+                },
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _callSearchWord() {
+    String word = textController.value.text;
+    if (word.isEmpty) {
+      return;
+    }
+    theBloc.add(SearchWordEventGetWord(word));
   }
 }

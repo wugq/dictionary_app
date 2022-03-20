@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'src/app.dart';
@@ -7,6 +9,8 @@ import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
+
   await di.init();
 
   // Set up the SettingsController, which will glue user settings to multiple
@@ -21,4 +25,13 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }
