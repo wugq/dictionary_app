@@ -20,14 +20,15 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   late TextEditingController textController;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late Word theWord;
-  late SearchWordBloc theBloc;
   final audioPlayer = AudioPlayer();
+
+  List<Word> wordList = [];
+  String wordText = "";
+  late SearchWordBloc theBloc;
 
   @override
   void initState() {
     super.initState();
-    theWord = const Word(text: "", pronunciationList: [], meaningList: []);
     textController = TextEditingController();
     theBloc = sl<SearchWordBloc>();
   }
@@ -39,7 +40,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: searchWidget(),
+        title: _searchWidget(),
         centerTitle: true,
         elevation: 0,
       ),
@@ -49,7 +50,8 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
           listener: (context, state) {
             if (state is SearchWordStateLoaded) {
               setState(() {
-                theWord = state.wordList.first; // TODO: show all words
+                wordList = state.wordList;
+                wordText = wordList.first.text;
               });
             }
           },
@@ -60,9 +62,12 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                 padding: EdgeInsets.zero,
                 scrollDirection: Axis.vertical,
                 children: [
-                  thisWordWidget(theWord.text),
-                  showPronunciationList(theWord.pronunciationList),
-                  showMeaningList(theWord.meaningList),
+                  _thisWordWidget(wordText),
+                  for (Word word in wordList)
+                    _showPronunciationList(word.pronunciationList),
+                  const SizedBox(height: 10),
+                  for (Word word in wordList)
+                    _showMeaningList(word.meaningList),
                 ],
               ),
             ),
@@ -72,7 +77,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     );
   }
 
-  Widget showPronunciationList(List<Pronunciation> list) {
+  Widget _showPronunciationList(List<Pronunciation> list) {
     if (list.isEmpty) {
       return Container();
     }
@@ -81,26 +86,27 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          for (var pronunciation in list) pronunciationBtn(pronunciation),
+          for (var pronunciation in list) _pronunciationBtn(pronunciation),
         ],
       ),
     );
   }
 
-  Widget showMeaningList(List<Meaning> list) {
+  Widget _showMeaningList(List<Meaning> list) {
     if (list.isEmpty) {
       return Container();
     }
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (var meaning in list)
           for (var definition in meaning.definitionList)
-            definitionWidget(definition)
+            _definitionWidget(definition, meaning.partOfSpeech)
       ],
     );
   }
 
-  Widget definitionWidget(Definition definition) {
+  Widget _definitionWidget(Definition definition, String partOfSpeech) {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       color: const Color(0xFFF5F5F5),
@@ -110,17 +116,16 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                definition.definition,
-                style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Color(0xFF270303),
-                    fontWeight: FontWeight.normal),
-              ),
+            Text(partOfSpeech),
+            Text(
+              definition.definition,
+              style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  color: Color(0xFF270303),
+                  fontWeight: FontWeight.normal),
             ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
@@ -132,15 +137,12 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                   for (var item in definition.exampleList)
                     Padding(
                       padding: const EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "* $item",
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w300,
-                          ),
+                      child: Text(
+                        "* $item",
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w300,
                         ),
                       ),
                     ),
@@ -153,30 +155,42 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     );
   }
 
-  Widget pronunciationBtn(Pronunciation pronunciation) {
+  Widget _pronunciationBtn(Pronunciation pronunciation) {
     return Padding(
       padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          playAudio(pronunciation.audio);
-        },
-        style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
+      child: pronunciation.audio.trim().isNotEmpty
+          ? ElevatedButton.icon(
+              onPressed: () {
+                _playAudio(pronunciation.audio);
+              },
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                ),
+              ),
+              label: Text(pronunciation.text),
+              icon: const FaIcon(
+                FontAwesomeIcons.volumeHigh,
+                size: 12,
+              ),
+            )
+          : ElevatedButton(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  ),
+                ),
+              ),
+              onPressed: () {},
+              child: Text(pronunciation.text),
             ),
-          ),
-        ),
-        label: Text(pronunciation.text),
-        icon: const FaIcon(
-          FontAwesomeIcons.volumeHigh,
-          size: 12,
-        ),
-      ),
     );
   }
 
-  Widget thisWordWidget(String title) {
+  Widget _thisWordWidget(String title) {
     if (title == "") {
       return Container();
     }
@@ -193,7 +207,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     );
   }
 
-  Widget searchWidget() {
+  Widget _searchWidget() {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: 90,
@@ -268,7 +282,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
     theBloc.add(SearchWordEventGetWord(word));
   }
 
-  void playAudio(String url) async {
+  void _playAudio(String url) async {
     String audioUrl = url.trim();
     if (audioUrl.isEmpty) {
       return;

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'src/app.dart';
@@ -9,7 +10,9 @@ import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
+  if (kDebugMode) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
 
   await di.init();
 
