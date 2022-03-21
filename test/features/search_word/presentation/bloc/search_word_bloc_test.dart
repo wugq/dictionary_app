@@ -30,7 +30,7 @@ void main() {
   blocTest<SearchWordBloc, SearchWordState>(
     "should return [Loading, Loaded] when data is gotten successfully",
     build: () {
-      when(mockSearchWord(any)).thenAnswer((_) async => const Right(tWord));
+      when(mockSearchWord(any)).thenAnswer((_) async => const Right([tWord]));
       return searchWordBloc;
     },
     act: (bloc) {
@@ -38,7 +38,7 @@ void main() {
     },
     expect: () => [
       SearchWordStateLoading(),
-      const SearchWordStateLoaded(tWord),
+      const SearchWordStateLoaded([tWord]),
     ],
   );
 

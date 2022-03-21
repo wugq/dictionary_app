@@ -39,10 +39,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Dictionary',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: searchWidget(),
         centerTitle: true,
         elevation: 0,
       ),
@@ -52,7 +49,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
           listener: (context, state) {
             if (state is SearchWordStateLoaded) {
               setState(() {
-                theWord = state.word;
+                theWord = state.wordList.first; // TODO: show all words
               });
             }
           },
@@ -63,7 +60,6 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                 padding: EdgeInsets.zero,
                 scrollDirection: Axis.vertical,
                 children: [
-                  searchWidget(),
                   thisWordWidget(theWord.text),
                   showPronunciationList(theWord.pronunciationList),
                   showMeaningList(theWord.meaningList),
@@ -200,7 +196,7 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   Widget searchWidget() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 100,
+      height: 90,
       decoration: const BoxDecoration(),
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 0),
@@ -227,14 +223,14 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                       color: Color(0xFF9E9E9E),
                       width: 1,
                     ),
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(
                       color: Color(0xFF9E9E9E),
                       width: 1,
                     ),
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   prefixIcon: const Icon(
                     Icons.search,

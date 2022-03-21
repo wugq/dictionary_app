@@ -27,10 +27,10 @@ void main() {
 
   test("should get word from repository", () async {
     when(mockRepository.search(any))
-        .thenAnswer((_) async => const Right(tWord));
+        .thenAnswer((_) async => const Right([tWord]));
 
     final result = await searchWord(const SearchWordParam(word: tText));
-    expect(result, const Right(tWord));
+    expect(result, const Right([tWord]));
 
     verify(mockRepository.search(tText));
     verifyNoMoreInteractions(mockRepository);

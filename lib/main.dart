@@ -31,7 +31,12 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
+        final isValidHost = host == "api.dictionaryapi.dev";
+
+        // Allowing multiple hosts
+        // final isValidHost = host == "api.my_app" || host == "my_second_host";
+        return isValidHost;
+      };
   }
 }

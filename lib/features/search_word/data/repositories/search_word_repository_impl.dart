@@ -10,10 +10,10 @@ class SearchWordRepositoryImpl implements SearchWordRepository {
   SearchWordRepositoryImpl(this.dataSource);
 
   @override
-  Future<Either<Failure, Word>> search(String text) async {
+  Future<Either<Failure, List<Word>>> search(String text) async {
     try {
-      final word = await dataSource.search(text);
-      return Right(word);
+      final wordList = await dataSource.search(text);
+      return Right(wordList);
     } on ServerException {
       return Left(ServerFailure());
     }

@@ -38,9 +38,10 @@ void main() {
   test('should return valid model when http request is succeed', () async {
     setupMockHttpClientSuccess200();
     final result = await dataSource.search("test");
-    expect(result.text, "hello");
-    expect(result.pronunciationList.length, 3);
-    expect(result.meaningList.length, 3);
+    final data = result.first;
+    expect(data.text, "hello");
+    expect(data.pronunciationList.length, 3);
+    expect(data.meaningList.length, 3);
   });
 
   test('should throw serverException when http request is failed', () async {

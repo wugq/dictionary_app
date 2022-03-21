@@ -15,12 +15,12 @@ class SearchWordStateLoading extends SearchWordState {
 }
 
 class SearchWordStateLoaded extends SearchWordState {
-  final Word word;
+  final List<Word> wordList;
 
-  const SearchWordStateLoaded(this.word);
+  const SearchWordStateLoaded(this.wordList);
 
   @override
-  List<Object?> get props => [word];
+  List<Object?> get props => [wordList];
 }
 
 class SearchWordStateFailed extends SearchWordState {
