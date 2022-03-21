@@ -8,4 +8,4 @@ API is https://dictionaryapi.dev/
 
 ## The Screen Shot
 
-![](./screen_shots/Screenshot_20220321_110221.png)
+<img src="./screen_shots/main_page.png" width="200">
