@@ -1,6 +1,7 @@
 // import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:dictionary/core/core.dart';
 import 'package:dictionary/features/search_word/domain/entities/word.dart';
 import 'package:dictionary/features/search_word/domain/usecases/search_word.dart';
 import 'package:equatable/equatable.dart';
@@ -28,7 +29,13 @@ class SearchWordBloc extends Bloc<SearchWordEvent, SearchWordState> {
     emit(SearchWordStateLoading());
     final failedOrWord = await searchWord(SearchWordParam(word: text));
     failedOrWord.fold(
-      (l) => emit(const SearchWordStateFailed(serverFailureMessage)),
+      (l) {
+        if (l is ServerFailure) {
+          emit(SearchWordStateFailed(l.message));
+        } else {
+          emit(const SearchWordStateFailed(serverFailureMessage));
+        }
+      },
       (r) => emit(SearchWordStateLoaded(r)),
     );
   }

@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:dartz/dartz.dart';
 import 'package:dictionary/core/core.dart';
@@ -6,7 +5,6 @@ import 'package:dictionary/features/search_word/data/datasources/search_word_rem
 import 'package:dictionary/features/search_word/data/models/free_dictionary_api/word_model.dart';
 import 'package:dictionary/features/search_word/data/repositories/search_word_repository_impl.dart';
 import 'package:dictionary/features/search_word/domain/entities/word.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -44,8 +42,8 @@ void main() {
   });
 
   test('should return server failure when search is unsuccessful', () async {
-    when(mockRemoteDataSource.search(any)).thenThrow(ServerException());
+    when(mockRemoteDataSource.search(any)).thenThrow(ServerException("mock failure"));
     final result = await repository.search(tText);
-    expect(result, equals(Left(ServerFailure())));
+    expect(result, equals(const Left(ServerFailure("mock failure"))));
   });
 }

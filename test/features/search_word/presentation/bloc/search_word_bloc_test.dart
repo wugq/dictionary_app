@@ -45,7 +45,7 @@ void main() {
   blocTest<SearchWordBloc, SearchWordState>(
     "should return [Loading, Failed] when getting data is failed",
     build: () {
-      when(mockSearchWord(any)).thenAnswer((_) async => Left(ServerFailure()));
+      when(mockSearchWord(any)).thenAnswer((_) async => const Left(ServerFailure("mock failure")));
       return searchWordBloc;
     },
     act: (bloc) {

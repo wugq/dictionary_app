@@ -53,6 +53,10 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                 wordList = state.wordList;
                 wordText = wordList.first.text;
               });
+            } else if (state is SearchWordStateFailed) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(state.message),
+              ));
             }
           },
           child: SafeArea(

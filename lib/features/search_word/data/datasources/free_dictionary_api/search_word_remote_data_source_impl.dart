@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dictionary/core/core.dart';
 import 'package:dictionary/features/search_word/data/datasources/search_word_remote_data_source.dart';
 import 'package:dictionary/features/search_word/data/models/free_dictionary_api/word_model.dart';
-import 'package:dictionary/features/search_word/domain/entities/word.dart';
 import 'package:http/http.dart' as http;
 
 class SearchWordRemoteDataSourceImpl implements SearchWordRemoteDataSource {
@@ -24,8 +23,10 @@ class SearchWordRemoteDataSourceImpl implements SearchWordRemoteDataSource {
         wordList = bodyJson.map((e) => WordModel.fromJson(e)).toList();
       }
       return wordList;
+    } else if (response.statusCode == 404) {
+      throw ServerException("No Definitions Found");
     } else {
-      throw ServerException();
+      throw ServerException("unknown error");
     }
   }
 }

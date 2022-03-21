@@ -14,8 +14,8 @@ class SearchWordRepositoryImpl implements SearchWordRepository {
     try {
       final wordList = await dataSource.search(text);
       return Right(wordList);
-    } on ServerException {
-      return Left(ServerFailure());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     }
   }
 }
