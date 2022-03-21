@@ -1,3 +1,4 @@
+import 'package:dictionary/features/search_word/presentation/widgets/pronunciation_list_widget.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,8 +68,11 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
                 scrollDirection: Axis.vertical,
                 children: [
                   _thisWordWidget(wordText),
-                  for (Word word in wordList)
-                    _showPronunciationList(word.pronunciationList),
+                  const SizedBox(height: 10),
+                  PronunciationListWidget(
+                    playerInstance: audioPlayer,
+                    wordList: wordList,
+                  ),
                   const SizedBox(height: 10),
                   for (Word word in wordList)
                     _showMeaningList(word.meaningList),
@@ -77,21 +81,6 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _showPronunciationList(List<Pronunciation> list) {
-    if (list.isEmpty) {
-      return Container();
-    }
-    return SizedBox(
-      height: 30,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          for (var pronunciation in list) _pronunciationBtn(pronunciation),
-        ],
       ),
     );
   }
@@ -111,86 +100,54 @@ class _DictionaryHomePageWidgetState extends State<DictionaryHomePageWidget> {
   }
 
   Widget _definitionWidget(Definition definition, String partOfSpeech) {
-    return Card(
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      color: const Color(0xFFF5F5F5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Text(partOfSpeech),
-            Text(
-              definition.definition,
-              style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  color: Color(0xFF270303),
-                  fontWeight: FontWeight.normal),
-            ),
-            Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var item in definition.exampleList)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
-                      child: Text(
-                        "* $item",
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Card(
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        color: const Color(0xFFF5F5F5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(10, 10, 10, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Text(partOfSpeech),
+              Text(
+                definition.definition,
+                style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Color(0xFF270303),
+                    fontWeight: FontWeight.normal),
+              ),
+              Padding(
+                padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var item in definition.exampleList)
+                      Padding(
+                        padding: const EdgeInsetsDirectional.fromSTEB(0, 5, 0, 0),
+                        child: Text(
+                          "* $item",
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w300,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _pronunciationBtn(Pronunciation pronunciation) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(10, 0, 0, 0),
-      child: pronunciation.audio.trim().isNotEmpty
-          ? ElevatedButton.icon(
-              onPressed: () {
-                _playAudio(pronunciation.audio);
-              },
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
-                ),
-              ),
-              label: Text(pronunciation.text),
-              icon: const FaIcon(
-                FontAwesomeIcons.volumeHigh,
-                size: 12,
-              ),
-            )
-          : ElevatedButton(
-              style: ButtonStyle(
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(pronunciation.text),
-            ),
     );
   }
 
